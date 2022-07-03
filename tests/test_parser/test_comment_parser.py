@@ -1,7 +1,7 @@
 from unittest.mock import patch
 
 from .util import mock_request_get_content
-from weibo_spider.parser.comment_parser import CommentParser
+from weibo_sdk.parser.comment_parser import CommentParser
 
 
 @patch('requests.get', mock_request_get_content)

@@ -1,7 +1,7 @@
 from unittest.mock import patch
 
 from .util import mock_request_get_content
-from weibo_spider.parser.album_parser import AlbumParser
+from weibo_sdk.parser.album_parser import AlbumParser
 
 
 @patch('requests.get', mock_request_get_content)

@@ -1,7 +1,7 @@
 from unittest.mock import patch
 
 from .util import mock_request_get_content
-from weibo_spider.parser.mblog_picAll_parser import MblogPicAllParser
+from weibo_sdk.parser.mblog_picAll_parser import MblogPicAllParser
 
 
 @patch('requests.get', mock_request_get_content)

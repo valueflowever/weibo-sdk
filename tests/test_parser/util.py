@@ -2,7 +2,7 @@ import json
 import os
 from unittest.mock import Mock
 
-from weibo_spider.parser.util import TEST_DATA_DIR, URL_MAP_FILE
+from weibo_sdk.parser.util import TEST_DATA_DIR, URL_MAP_FILE
 
 
 def mock_request_get_content(url, headers):

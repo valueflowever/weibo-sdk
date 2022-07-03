@@ -1,6 +1,6 @@
 from unittest.mock import patch
 
-from weibo_spider.parser.page_parser import PageParser
+from weibo_sdk.parser.page_parser import PageParser
 
 from .util import mock_request_get_content
 
