@@ -1,17 +1,10 @@
 import setuptools
 
-with open('README.md', 'r', encoding='utf-8') as fh:
-    long_description = fh.read()
-
 setuptools.setup(
     name='weibo-sdk',
-    version='0.3.0',
+    version='0.1.0',
     description='新浪微博sdk',
-    long_description=long_description,
-    long_description_content_type='text/markdown',
-    url='https://github.com/dataabc/weiboSpider',
-    packages=setuptools.find_packages(),
-    package_data={'weibo_sdk': ['config_sample.json', 'logging.conf']},
+    url='https://github.com/valueflowever/weibo-sdk',
     classifiers=[
         'Programming Language :: Python :: 3',
         'Operating System :: OS Independent',
