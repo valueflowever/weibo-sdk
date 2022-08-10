@@ -6,25 +6,19 @@ import logging
 import logging.config
 import os
 import random
-import shutil
 import sys
 from datetime import date, datetime, timedelta
 from time import sleep
 
-from absl import app, flags
 from tqdm import tqdm
 
-from . import config_util, datetime_util
-from .downloader import AvatarPictureDownloader
-from .parser import AlbumParser, IndexParser, PageParser, PhotoParser
-from .user import User
+import weibo_sdk.config_util as config_util
+import weibo_sdk.datetime_util as datetime_util
 
-FLAGS = flags.FLAGS
+from weibo_sdk.downloader import AvatarPictureDownloader
+from weibo_sdk.parser import AlbumParser, IndexParser, PageParser, PhotoParser
+from weibo_sdk.user import User
 
-flags.DEFINE_string('config_path', None, 'The path to config.json.')
-flags.DEFINE_string('u', None, 'The user_id we want to input.')
-flags.DEFINE_string('user_id_list', None, 'The path to user_id_list.txt.')
-flags.DEFINE_string('output_dir', None, 'The dir path to store results.')
 
 logging_path = os.path.split(
     os.path.realpath(__file__))[0] + os.sep + 'logging.conf'
@@ -70,23 +64,12 @@ class Spider:
             'result_dir_name', 0)  # 结果目录名，取值为0或1，决定结果文件存储在用户昵称文件夹里还是用户id文件夹里
         self.cookie = config['cookie']
         self.mysql_config = config.get('mysql_config')  # MySQL数据库连接配置，可以不填
-
         self.sqlite_config = config.get('sqlite_config')
         self.kafka_config = config.get('kafka_config')
         self.mongo_config = config.get('mongo_config')
         self.user_config_file_path = ''
         user_id_list = config['user_id_list']
-        if FLAGS.user_id_list:
-            user_id_list = FLAGS.user_id_list
-        if not isinstance(user_id_list, list):
-            if not os.path.isabs(user_id_list):
-                user_id_list = os.getcwd() + os.sep + user_id_list
-            if not os.path.isfile(user_id_list):
-                logger.warning('不存在%s文件', user_id_list)
-                sys.exit()
-            self.user_config_file_path = user_id_list
-        if FLAGS.u:
-            user_id_list = FLAGS.u.split(',')
+
         if isinstance(user_id_list, list):
             # 第一部分是处理dict类型的
             # 第二部分是其他类型,其他类型提供去重功能
@@ -110,14 +93,8 @@ class Spider:
                                 user_id for user_id in user_id_list
                                 if not isinstance(user_id, dict)
                             ])))
-            if FLAGS.u:
-                config_util.add_user_uri_list(self.user_config_file_path,
-                                              user_id_list)
         else:
-            user_config_list = config_util.get_user_config_list(
-                user_id_list, self.since_date)
-            for user_config in user_config_list:
-                user_config['end_date'] = self.end_date
+            raise TypeError("user_id must be list")
         self.user_config_list = user_config_list  # 要爬取的微博用户的user_config列表
         self.user_config = {}  # 用户配置,包含用户id和since_date
         self.new_since_date = ''  # 完成某用户爬取后，自动生成对应用户新的since_date
@@ -209,15 +186,6 @@ class Spider:
                             sleep(1)
                         self.page_count = 0
                         self.global_wait.append(self.global_wait.pop(0))
-
-                # 更新用户user_id_list.txt中的since_date
-                if self.user_config_file_path or FLAGS.u:
-                    config_util.update_user_config_file(
-                        self.user_config_file_path,
-                        self.user_config['user_uri'],
-                        self.user.nickname,
-                        self.new_since_date,
-                    )
         except Exception as e:
             logger.exception(e)
 
@@ -227,10 +195,7 @@ class Spider:
             dir_name = self.user.nickname
             if self.result_dir_name:
                 dir_name = self.user.id
-            if FLAGS.output_dir is not None:
-                file_dir = FLAGS.output_dir + os.sep + dir_name
-            else:
-                file_dir = (os.getcwd() + os.sep + 'weibo' + os.sep + dir_name)
+            file_dir = (os.getcwd() + os.sep + 'weibo' + os.sep + dir_name)
             if type == 'img' or type == 'video':
                 file_dir = file_dir + os.sep + type
             if not os.path.isdir(file_dir):
@@ -351,20 +316,8 @@ class Spider:
             logger.exception(e)
 
 
-def _get_config():
+def _get_config(config_path):
     """获取config.json数据"""
-    src = os.path.split(
-        os.path.realpath(__file__))[0] + os.sep + 'config_sample.json'
-    config_path = os.getcwd() + os.sep + 'config.json'
-    if FLAGS.config_path:
-        config_path = FLAGS.config_path
-    elif not os.path.isfile(config_path):
-        shutil.copy(src, config_path)
-        logger.info(u'请先配置当前目录(%s)下的config.json文件，'
-                    u'如果想了解config.json参数的具体意义及配置方法，请访问\n'
-                    u'https://github.com/dataabc/weiboSpider#2程序设置' %
-                    os.getcwd())
-        sys.exit()
     try:
         with open(config_path) as f:
             config = json.loads(f.read())
@@ -375,7 +328,7 @@ def _get_config():
         sys.exit()
 
 
-def main(_):
+def main():
     try:
         config = _get_config()
         config_util.validate_config(config)
@@ -386,4 +339,4 @@ def main(_):
 
 
 if __name__ == '__main__':
-    app.run(main)
+    main()
