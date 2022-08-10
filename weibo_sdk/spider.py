@@ -231,7 +231,7 @@ class Spider:
 
             self.writers.append(JsonWriter(self._get_filepath('json')))
         if 'mysql' in self.write_mode:
-            from .writer import MySqlWriter
+            from weibo_sdk.writer import MySqlWriter
 
             self.writers.append(MySqlWriter(self.mysql_config))
         if 'mongo' in self.write_mode:
@@ -332,7 +332,7 @@ def main():
         config = _get_config('../config.json')
         config_util.validate_config(config)
         wb = Spider(config)
-        # wb.start()  # 爬取微博信息
+        wb.start()  # 爬取微博信息
     except Exception as e:
         logger.exception(e)
 
