@@ -59,7 +59,7 @@ def handle_garbled(info):
 def handle_content(text):
     """获取微博长文多行数据"""
     try:
-        text = text[3:]
+        text = text[4:]
         inx = 0
         for t in text:
             if t == '关注他':
@@ -67,7 +67,7 @@ def handle_content(text):
                 break
         text = text[:inx - 4]
         text[0] = text[0][1:]
-        text = "\n".join(text)
+        text = "/n".join(text)
         return text
     except Exception as e:
         logger.exception(e)
@@ -82,7 +82,7 @@ def handle_short_content(text):
             inx = text.index(t)
             break
     text = text[:inx - 7]
-    text = "\n".join(text)
+    text = "/n".join(text)
     return text
 
 
