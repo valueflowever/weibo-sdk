@@ -64,9 +64,9 @@ class PageParser(Parser):
             weibos = []
             if is_exist:
                 since_date = datetime_util.str_to_time(self.since_date)
-                for i in range(0, len(info) - 1):
+                for i in range(1, len(info)):
                     n_info = self.selector.xpath(f"//div[@class='c']{[i]}//text()")
-                    weibo = self.get_one_weibo(info[i], n_info)
+                    weibo = self.get_one_weibo(info[i-1], n_info)
                     if weibo:
                         if weibo.id in weibo_id_list:
                             continue
@@ -87,10 +87,14 @@ class PageParser(Parser):
             logger.exception(e)
 
     def is_original(self, info):
-        """判断微博是否为原创微博"""
+        """判断微博是否为原创微博(不含有原创转发)"""
         is_original = info.xpath("div/span[@class='cmt']")
         if len(is_original) > 3:
-            return False
+            if is_original[0].xpath('string(.)')[:2] == '转发':
+                return False
+            else:
+                logger.error('error: ' + is_original[0].xpath('string(.)')[:2])
+                return False
         else:
             return True
 
