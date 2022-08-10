@@ -67,10 +67,23 @@ def handle_content(text):
                 break
         text = text[:inx - 4]
         text[0] = text[0][1:]
+        text = "\n".join(text)
         return text
     except Exception as e:
         logger.exception(e)
         return u'无'
+
+
+def handle_short_content(text):
+    """获取微博短文多行数据"""
+    inx = 0
+    for t in text:
+        if t == '收藏':
+            inx = text.index(t)
+            break
+    text = text[:inx - 7]
+    text = "\n".join(text)
+    return text
 
 
 def bid2mid(bid):

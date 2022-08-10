@@ -8,7 +8,7 @@ from ..weibo import Weibo
 from .comment_parser import CommentParser
 from .mblog_picAll_parser import MblogPicAllParser
 from .parser import Parser
-from .util import handle_garbled, handle_html, to_video_download_url
+from .util import handle_garbled, handle_html, to_video_download_url, handle_short_content
 
 logger = logging.getLogger('spider.page_parser')
 
@@ -65,7 +65,8 @@ class PageParser(Parser):
             if is_exist:
                 since_date = datetime_util.str_to_time(self.since_date)
                 for i in range(0, len(info) - 1):
-                    weibo = self.get_one_weibo(info[i])
+                    n_info = self.selector.xpath(f"//div[@class='c']{[i]}//text()")
+                    weibo = self.get_one_weibo(info[i], n_info)
                     if weibo:
                         if weibo.id in weibo_id_list:
                             continue
@@ -93,11 +94,10 @@ class PageParser(Parser):
         else:
             return True
 
-    def get_original_weibo(self, info, weibo_id):
+    def get_original_weibo(self, info, n_info, weibo_id):
         """获取原创微博"""
         try:
-            weibo_content = handle_garbled(info)
-            weibo_content = weibo_content[:weibo_content.rfind(u'赞')]
+            weibo_content = handle_short_content(n_info)
             a_text = info.xpath('div//a/text()')
             if u'全文' in a_text:
                 wb_content = CommentParser(self.cookie,
@@ -136,12 +136,12 @@ class PageParser(Parser):
         except Exception as e:
             logger.exception(e)
 
-    def get_weibo_content(self, info, is_original):
+    def get_weibo_content(self, info, n_info, is_original):
         """获取微博内容"""
         try:
             weibo_id = info.xpath('@id')[0][2:]
             if is_original:
-                weibo_content = self.get_original_weibo(info, weibo_id)
+                weibo_content = self.get_original_weibo(info, n_info, weibo_id)
             else:
                 weibo_content = self.get_retweet(info, weibo_id)
             return weibo_content
@@ -309,7 +309,7 @@ class PageParser(Parser):
         else:
             return False
 
-    def get_one_weibo(self, info):
+    def get_one_weibo(self, info, n_info):
         """获取一条微博的全部信息"""
         try:
             weibo = Weibo()
@@ -317,7 +317,7 @@ class PageParser(Parser):
             weibo.original = is_original  # 是否原创微博
             if (not self.filter) or is_original:
                 weibo.id = info.xpath('@id')[0][2:]
-                weibo.content = self.get_weibo_content(info,
+                weibo.content = self.get_weibo_content(info, n_info,
                                                        is_original)  # 微博内容
                 weibo.article_url = self.get_article_url(info)  # 头条文章url
                 picture_urls = self.get_picture_urls(info, is_original)

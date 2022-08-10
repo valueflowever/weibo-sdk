@@ -19,7 +19,6 @@ from weibo_sdk.downloader import AvatarPictureDownloader
 from weibo_sdk.parser import AlbumParser, IndexParser, PageParser, PhotoParser
 from weibo_sdk.user import User
 
-
 logging_path = os.path.split(
     os.path.realpath(__file__))[0] + os.sep + 'logging.conf'
 logging.config.fileConfig(logging_path)
@@ -83,16 +82,16 @@ class Spider:
                         user_id for user_id in user_id_list
                         if isinstance(user_id, dict)
                     ])) + list(
-                        map(
-                            lambda x: {
-                                'user_uri': x,
-                                'since_date': self.since_date,
-                                'end_date': self.end_date
-                            },
-                            set([
-                                user_id for user_id in user_id_list
-                                if not isinstance(user_id, dict)
-                            ])))
+                map(
+                    lambda x: {
+                        'user_uri': x,
+                        'since_date': self.since_date,
+                        'end_date': self.end_date
+                    },
+                    set([
+                        user_id for user_id in user_id_list
+                        if not isinstance(user_id, dict)
+                    ])))
         else:
             raise TypeError("user_id must be list")
         self.user_config_list = user_config_list  # 要爬取的微博用户的user_config列表
@@ -156,7 +155,7 @@ class Spider:
                     weibos, self.weibo_id_list, to_continue = PageParser(
                         self.cookie,
                         self.user_config, page, self.filter).get_one_page(
-                            self.weibo_id_list)  # 获取第page页的全部微博
+                        self.weibo_id_list)  # 获取第page页的全部微博
                     logger.info(
                         u'%s已获取%s(%s)的第%d页微博%s',
                         '-' * 30,
@@ -330,10 +329,10 @@ def _get_config(config_path):
 
 def main():
     try:
-        config = _get_config()
+        config = _get_config('../config.json')
         config_util.validate_config(config)
         wb = Spider(config)
-        wb.start()  # 爬取微博信息
+        # wb.start()  # 爬取微博信息
     except Exception as e:
         logger.exception(e)
 
