@@ -56,6 +56,23 @@ def handle_garbled(info):
         return u'无'
 
 
+def handle_content(text):
+    """获取微博长文多行数据"""
+    try:
+        text = text[3:]
+        inx = 0
+        for t in text:
+            if t == '关注他':
+                inx = text.index(t)
+                break
+        text = text[:inx - 4]
+        text[0] = text[0][1:]
+        return text
+    except Exception as e:
+        logger.exception(e)
+        return u'无'
+
+
 def bid2mid(bid):
     """convert string bid to string mid"""
     alphabet = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
@@ -74,7 +91,7 @@ def bid2mid(bid):
         strlen = len(d)
         for char in d:
             power = (strlen - (idx + 1))
-            num += alphabet.index(char) * (base**power)
+            num += alphabet.index(char) * (base ** power)
             idx += 1
             strnum = str(num)
             while (len(d) == 4 and len(strnum) < 7):
@@ -118,3 +135,8 @@ def string_to_int(string):
     elif string.endswith(u'亿'):
         string = float(string[:-1]) * 100000000
     return int(string)
+
+
+if __name__ == '__main__':
+    test = ''
+    handle_garbled()

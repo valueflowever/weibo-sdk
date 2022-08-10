@@ -4,7 +4,7 @@ import requests
 from time import sleep
 
 from .parser import Parser
-from .util import handle_garbled, handle_html
+from .util import handle_content, handle_html
 
 logger = logging.getLogger('spider.comment_parser')
 
@@ -21,11 +21,8 @@ class CommentParser(Parser):
             for i in range(5):
                 self.selector = handle_html(self.cookie, self.url)
                 if self.selector is not None:
-                    info = self.selector.xpath("//div[@class='c']")[1]
-                    wb_content = handle_garbled(info)
-                    wb_time = info.xpath("//span[@class='ct']/text()")[0]
-                    weibo_content = wb_content[wb_content.find(':') +
-                                               1:wb_content.rfind(wb_time)]
+                    text = self.selector.xpath("//div[@class='c']//text()")
+                    weibo_content = handle_content(text)
                     if weibo_content is not None:
                         return weibo_content
                 sleep(random.randint(6, 10))
