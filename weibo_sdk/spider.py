@@ -327,15 +327,15 @@ def _get_config(config_path):
         sys.exit()
 
 
-def main():
+def run(cover_config: dict):
     try:
-        config = _get_config('../config.json')
+        config = _get_config('./config.json')
+        if cover_config:
+            for index, key in cover_config.items():
+                config[index] = key
         config_util.validate_config(config)
         wb = Spider(config)
         wb.start()  # 爬取微博信息
     except Exception as e:
         logger.exception(e)
 
-
-if __name__ == '__main__':
-    main()
