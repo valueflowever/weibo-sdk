@@ -65,6 +65,11 @@ def handle_content(text):
             if t == '关注他':
                 inx = text.index(t)
                 break
+        if inx == 0:
+            for t in text:
+                if t == '举报':
+                    inx = text.index(t)
+                    break
         text = text[:inx - 4]
         text[0] = text[0][1:]
         text = "/n".join(text)
