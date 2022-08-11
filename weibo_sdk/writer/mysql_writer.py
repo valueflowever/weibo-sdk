@@ -133,7 +133,6 @@ class MySqlWriter(Writer):
                     weibo_num INT,
                     following INT,
                     followers INT,
-                    is_user INT DEFAULT 0,
                     PRIMARY KEY (id)
                     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4"""
             self._mysql_create_table(create_table)
