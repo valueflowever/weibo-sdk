@@ -6,6 +6,8 @@ import sys
 import requests
 from lxml import etree
 
+from ..middleware.utils import filter_text
+
 # Set GENERATE_TEST_DATA to True when generating test data.
 GENERATE_TEST_DATA = False
 TEST_DATA_DIR = 'tests/testdata'
@@ -72,7 +74,8 @@ def handle_content(text):
                     break
         text = text[:inx - 4]
         text[0] = text[0][1:]
-        text = "/n".join(text)
+        text_list = filter_text(text)
+        text = "/n".join(text_list)
         return text
     except Exception as e:
         logger.exception(e)
@@ -87,7 +90,8 @@ def handle_short_content(text):
             inx = text.index(t)
             break
     text = text[:inx - 7]
-    text = "/n".join(text)
+    text_list = filter_text(text)
+    text = "/n".join(text_list)
     return text
 
 

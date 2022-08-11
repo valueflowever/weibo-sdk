@@ -341,6 +341,8 @@ class PageParser(Parser):
             else:
                 weibo = None
                 logger.info(u'正在过滤转发微博')
+            if not weibo.content:
+                weibo = None
             return weibo
         except Exception as e:
             logger.exception(e)
