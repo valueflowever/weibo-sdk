@@ -1,5 +1,8 @@
 import requests
-from ..exception import LoginError, PostError
+from datetime import datetime
+
+from ..spider import run
+from ..exception import LoginError
 
 
 class Poster:
@@ -38,5 +41,9 @@ class Poster:
         if res.status_code == 200 and res.json()['ok'] == 1:
             return "success"
         else:
-            raise PostError("post failed")
+            return "failed"
 
+    @staticmethod
+    def update(user_id):
+        config = {'user_id_list': [user_id], 'since_date': datetime.now().strftime('%Y-%m-%d')}
+        run(config)
