@@ -17,7 +17,6 @@ class User:
         self.weibo_num = 0
         self.following = 0
         self.followers = 0
-        self.is_user = 0
 
     def __str__(self):
         """打印微博用户信息"""
