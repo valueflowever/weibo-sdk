@@ -100,14 +100,8 @@ def validate_config(config):
     user_id_list = config['user_id_list']
     if (not isinstance(user_id_list,
                        list)) and (not user_id_list.endswith('.txt')):
-        logger.warning(u'user_id_list值应为list类型或txt文件路径')
+        logger.warning(u'user_id_list值应为list类型')
         sys.exit()
-    if not isinstance(user_id_list, list):
-        if not os.path.isabs(user_id_list):
-            user_id_list = os.getcwd() + os.sep + user_id_list
-        if not os.path.isfile(user_id_list):
-            logger.warning(u'不存在%s文件', user_id_list)
-            sys.exit()
 
 
 def get_user_config_list(file_name, default_since_date):
