@@ -1,7 +1,7 @@
 import requests
 from datetime import datetime
 
-from ..spider import run
+from ..spider import run, logger
 from ..exception import LoginError
 
 
@@ -27,10 +27,13 @@ class Poster:
         if r['ok'] == 1 and r['data']['login']:
             return r['data']['st']
         else:
-            raise LoginError("login error")
+            logger.error(LoginError)
+            return ''
 
     def post(self, content: str):
         xsrf_token = self.get_xsrf_token()
+        if not xsrf_token:
+            return "login failed"
         url = 'https://m.weibo.cn/api/statuses/update'
         params = {
             'content': content,
