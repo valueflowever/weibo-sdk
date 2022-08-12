@@ -41,14 +41,18 @@ class PageParser(Parser):
         self.to_continue = True
         is_exist = ''
         for i in range(3):
-            self.selector = handle_html(self.cookie, self.url)
-            info = self.selector.xpath("//div[@class='c']")
-            if info is None or len(info) == 0:
-                continue
-            is_exist = info[0].xpath("div/span[@class='ctt']")
-            if is_exist:
-                PageParser.empty_count = 0
-                break
+            try:
+                self.selector = handle_html(self.cookie, self.url)
+                info = self.selector.xpath("//div[@class='c']")
+            except AttributeError as e:
+                logger.error(e)
+            else:
+                if info is None or len(info) == 0:
+                    continue
+                is_exist = info[0].xpath("div/span[@class='ctt']")
+                if is_exist:
+                    PageParser.empty_count = 0
+                    break
         if not is_exist:
             PageParser.empty_count += 1
         if PageParser.empty_count > 2:
