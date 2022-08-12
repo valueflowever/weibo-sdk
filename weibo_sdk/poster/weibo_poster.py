@@ -1,5 +1,6 @@
 import requests
 from datetime import datetime
+from lxml import etree
 
 from ..spider import run, logger
 from ..exception import LoginError
@@ -19,6 +20,11 @@ class Poster:
             'Accept-Language': 'zh-CN,zh;q=0.8,zh-TW;q=0.7,zh-HK;q=0.5,en-US;q=0.3,en;q=0.2',
             'MWeibo-Pwa': '1',
             'cookie': cookie
+        }
+        self.cn_headers = {
+            'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 12_0 like Mac OS X) AppleWebKit/604.1.38 (KHTML, like Gecko) Version/12.0 Mobile/15A372 Safari/604.1',
+            'referer': 'https://weibo.cn/',
+            'cookie': self.headers['cookie']
         }
 
     def get_xsrf_token(self) -> str:
@@ -50,3 +56,35 @@ class Poster:
     def update(user_id):
         config = {'user_id_list': [user_id], 'since_date': datetime.now().strftime('%Y-%m-%d')}
         run(config)
+
+    def get_cn_st(self):
+        url = 'https://weibo.cn/'
+        st = 0
+        for i in range(3):
+            try:
+                resp = requests.get(url, headers=self.cn_headers)
+                selector = etree.HTML(resp.content)
+                st = selector.xpath('//div/form/@action')[0].split('=')[-1]
+            except AttributeError as e:
+                logger.error(e)
+            else:
+                continue
+        return st
+
+    def delete(self, content_id):
+        st = self.get_cn_st()
+        if not st:
+            return "failed"
+        delete_url = f'https://weibo.cn/mblog/del?type=del&id={content_id}&act=delc&rl=0&st={st}'
+        d = requests.get(delete_url, headers=self.cn_headers)
+        if d.status_code == 200:
+            url1 = f'https://weibo.cn/comment/{content_id}'
+            resp = requests.get(url1, headers=self.cn_headers)
+            selector = etree.HTML(resp.content)
+            info = selector.xpath("//div[@class='me']")
+            if info:
+                return "success"
+            else:
+                return "failed"
+        else:
+            return "failed"
