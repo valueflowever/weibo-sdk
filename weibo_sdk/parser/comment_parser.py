@@ -1,6 +1,5 @@
 import logging
 import random
-import requests
 from time import sleep
 
 from .parser import Parser
@@ -25,7 +24,7 @@ class CommentParser(Parser):
                     weibo_content = handle_content(text)
                     if weibo_content is not None:
                         return weibo_content
-                sleep(random.randint(6, 10))
+                sleep(random.randint(2, 4))
         except Exception:
             logger.exception(u'网络出错')
 

@@ -2,6 +2,7 @@ import logging
 import re
 import sys
 from datetime import datetime, timedelta
+import time
 
 from .. import datetime_util
 from ..weibo import Weibo
@@ -45,7 +46,7 @@ class PageParser(Parser):
                 self.selector = handle_html(self.cookie, self.url)
                 info = self.selector.xpath("//div[@class='c']")
             except AttributeError as e:
-                logger.error(e)
+                logger.error(f"Page: {page}, err:" + str(e))
             else:
                 if info is None or len(info) == 0:
                     continue
@@ -53,9 +54,12 @@ class PageParser(Parser):
                 if is_exist:
                     PageParser.empty_count = 0
                     break
+            time.sleep(1)
         if not is_exist:
+            logger.error(f"error: {page} 页无法采集!")
             PageParser.empty_count += 1
-        if PageParser.empty_count > 2:
+        if PageParser.empty_count > 5:
+            logger.error("error: 超过五个页面无法采集，程序可能受到限制，暂停运行后，请重新再试!")
             self.to_continue = False
             PageParser.empty_count = 0
         self.filter = filter
