@@ -1,6 +1,7 @@
 import requests
 from datetime import datetime
 from lxml import etree
+import time
 
 from ..spider import run, logger
 from ..exception import LoginError
@@ -59,7 +60,6 @@ class Poster:
 
     def get_cn_st(self):
         url = 'https://weibo.cn/'
-        st = 0
         for i in range(3):
             try:
                 resp = requests.get(url, headers=self.cn_headers)
@@ -68,21 +68,34 @@ class Poster:
             except AttributeError as e:
                 logger.error(e)
             else:
-                continue
-        return st
+                return st
+            time.sleep(1)
+
+    def weibo_exist(self, content_id):
+        url = f'https://weibo.cn/comment/{content_id}'
+        for i in range(3):
+            try:
+                resp = requests.get(url, headers=self.cn_headers)
+                selector = etree.HTML(resp.content)
+                info = selector.xpath("//div[@class='me']")
+            except AttributeError as e:
+                logger.error(e)
+            else:
+                return info
+            time.sleep(1)
 
     def delete(self, content_id):
+        weibo_not_exist = self.weibo_exist(content_id)
+        if weibo_not_exist:
+            return "none"
         st = self.get_cn_st()
         if not st:
             return "failed"
         delete_url = f'https://weibo.cn/mblog/del?type=del&id={content_id}&act=delc&rl=0&st={st}'
         d = requests.get(delete_url, headers=self.cn_headers)
         if d.status_code == 200:
-            url1 = f'https://weibo.cn/comment/{content_id}'
-            resp = requests.get(url1, headers=self.cn_headers)
-            selector = etree.HTML(resp.content)
-            info = selector.xpath("//div[@class='me']")
-            if info:
+            info_exist = self.weibo_exist(content_id)
+            if info_exist:
                 return "success"
             else:
                 return "failed"
