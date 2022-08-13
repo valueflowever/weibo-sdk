@@ -1,4 +1,4 @@
-black_word = ['神秘嘉宾', '手把手教你', '开课', '给大家发一个福利', '讲师', '置顶', '原图', '直播连麦', '股票短线波段']
+black_word = []
 
 
 def filter_text(text_list: list):
