@@ -10,6 +10,7 @@ from .comment_parser import CommentParser
 from .mblog_picAll_parser import MblogPicAllParser
 from .parser import Parser
 from .util import handle_garbled, handle_html, to_video_download_url, handle_short_content
+from ..middleware.utils import toggle_cookie
 
 logger = logging.getLogger('spider.page_parser')
 
@@ -55,6 +56,13 @@ class PageParser(Parser):
                     PageParser.empty_count = 0
                     break
             time.sleep(1)
+            # 切换cookie
+            n_cookie = toggle_cookie(cookie)
+            if n_cookie:
+                self.cookie = n_cookie
+                logger.info(f"cookie已切换!")
+            else:
+                logger.info("尝试切换cookie失败")
         if not is_exist:
             logger.error(f"error: {page} 页无法采集!")
             PageParser.empty_count += 1
