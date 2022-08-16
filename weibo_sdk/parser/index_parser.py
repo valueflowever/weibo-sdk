@@ -21,6 +21,8 @@ class IndexParser(Parser):
             else:
                 self.cookie = cookie
                 logger.info("cookie无法切换")
+        else:
+            self.cookie = cookie
         self.selector = handle_html(self.cookie, self.url)
 
     def _get_user_id(self):
