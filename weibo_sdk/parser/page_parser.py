@@ -124,6 +124,9 @@ class PageParser(Parser):
                                            weibo_id).get_long_weibo()
                 if wb_content:
                     weibo_content = wb_content
+                else:
+                    logger.warning('cookie失效')
+                    sys.exit()
             return weibo_content
         except Exception as e:
             logger.exception(e)

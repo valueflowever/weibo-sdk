@@ -79,7 +79,11 @@ def handle_content(text):
         return text
     except Exception as e:
         logger.exception(e)
-        return u'无'
+        if not text:
+            logger.error('cookie已过期，请更换')
+        else:
+            logger.error('错误文本数据: ' + str(text))
+        return u''
 
 
 def handle_short_content(text):
