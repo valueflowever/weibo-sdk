@@ -3,15 +3,24 @@ import logging
 from .info_parser import InfoParser
 from .parser import Parser
 from .util import handle_html, string_to_int
+from ..middleware.utils import toggle_cookie
 
 logger = logging.getLogger('spider.index_parser')
 
 
 class IndexParser(Parser):
     def __init__(self, cookie, user_uri):
-        self.cookie = cookie
         self.user_uri = user_uri
-        self.url = 'https://weibo.cn/%s' % (user_uri)
+        self.url = 'https://weibo.cn/%s' % user_uri
+        selector = handle_html(cookie, self.url)
+        if not selector.xpath("//div[@class='u']/table"):
+            n_cookie = toggle_cookie(cookie)
+            if n_cookie:
+                logger.info("正在切换cookie...")
+                self.cookie = n_cookie
+            else:
+                self.cookie = cookie
+                logger.info("cookie无法切换")
         self.selector = handle_html(self.cookie, self.url)
 
     def _get_user_id(self):
@@ -46,7 +55,7 @@ class IndexParser(Parser):
     def get_page_num(self):
         """获取微博总页数"""
         try:
-            if self.selector.xpath("//input[@name='mp']") == []:
+            if not self.selector.xpath("//input[@name='mp']"):
                 page_num = 1
             else:
                 page_num = (int)(self.selector.xpath("//input[@name='mp']")
