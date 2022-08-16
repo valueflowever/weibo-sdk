@@ -57,7 +57,7 @@ class PageParser(Parser):
                     break
             time.sleep(1)
             # 切换cookie
-            n_cookie = toggle_cookie(cookie)
+            n_cookie = toggle_cookie(self.cookie)
             if n_cookie:
                 self.cookie = n_cookie
                 logger.info(f"cookie已切换!")
@@ -66,8 +66,8 @@ class PageParser(Parser):
         if not is_exist:
             logger.error(f"error: {page} 页无法采集!")
             PageParser.empty_count += 1
-        if PageParser.empty_count > 5:
-            logger.error("error: 超过五个页面无法采集，程序可能受到限制，暂停运行后，请重新再试!")
+        if PageParser.empty_count > 3:
+            logger.error("error: 超过三个页面无法采集，程序可能受到限制，暂停运行后，请重新再试!")
             self.to_continue = False
             PageParser.empty_count = 0
         self.filter = filter
