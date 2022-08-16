@@ -82,7 +82,7 @@ class PageParser(Parser):
                 since_date = datetime_util.str_to_time(self.since_date)
                 for i in range(1, len(info)):
                     n_info = self.selector.xpath(f"//div[@class='c']{[i]}//text()")
-                    weibo = self.get_one_weibo(info[i-1], n_info)
+                    weibo = self.get_one_weibo(info[i - 1], n_info)
                     if weibo:
                         if weibo.id in weibo_id_list:
                             continue
@@ -332,6 +332,9 @@ class PageParser(Parser):
     def get_one_weibo(self, info, n_info):
         """获取一条微博的全部信息"""
         try:
+            if n_info[1] == '置顶':
+                logger.info(u'正在过滤置顶微博')
+                return None
             weibo = Weibo()
             is_original = self.is_original(info)
             weibo.original = is_original  # 是否原创微博
