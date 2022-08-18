@@ -54,8 +54,8 @@ class Poster:
             return "failed"
 
     @staticmethod
-    def update(user_id):
-        config = {'user_id_list': [user_id], 'since_date': datetime.now().strftime('%Y-%m-%d')}
+    def update(user_id, cookie):
+        config = {'cookie': cookie, 'user_id_list': [user_id], 'since_date': datetime.now().strftime('%Y-%m-%d')}
         run(config)
 
     def get_cn_st(self):
