@@ -11,7 +11,7 @@ from .mblog_picAll_parser import MblogPicAllParser
 from .parser import Parser
 from .util import handle_garbled, handle_html, to_video_download_url, handle_short_content
 from ..middleware.utils import toggle_cookie
-from weibo_sdk.middleware.utils import flush_cookies
+from weibo_sdk.middleware.utils import refresh_cookie
 
 logger = logging.getLogger('spider.page_parser')
 
@@ -21,6 +21,7 @@ class PageParser(Parser):
 
     def __init__(self, cookie, user_config, page, filter):
         self.cookie = cookie
+        self.refresh_cookie = 0
         if hasattr(PageParser,
                    'user_uri') and self.user_uri != user_config['user_uri']:
             PageParser.empty_count = 0
@@ -99,7 +100,7 @@ class PageParser(Parser):
                         logger.info('-' * 100)
                         weibos.append(weibo)
                         weibo_id_list.append(weibo.id)
-            return weibos, weibo_id_list, self.to_continue
+            return weibos, weibo_id_list, self.to_continue, self.cookie, self.refresh_cookie
         except Exception as e:
             logger.exception(e)
 
@@ -132,7 +133,7 @@ class PageParser(Parser):
                         if i == 2:
                             logger.warning("error: 数据库cookie均已失效")
                             logger.info("生成新的cookie中...")
-                            flush_cookies()
+                            refresh_cookie()
                         if i == 4:
                             logger.warning("cookie刷新后，仍然无法使用")
                             sys.exit()
@@ -140,6 +141,7 @@ class PageParser(Parser):
                         if n_cookie:
                             logger.info("正在切换cookie...")
                             self.cookie = n_cookie
+                            self.refresh_cookie = 1
                         else:
                             logger.info("cookie无法切换")
                             sys.exit()
