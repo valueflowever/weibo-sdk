@@ -75,6 +75,8 @@ def handle_content(text):
         text = text[:inx - 4]
         text[0] = text[0][1:]
         text_list = filter_text(text)
+        if not text_list:
+            return 'filter_content'
         text = "/n".join(text_list)
         return text
     except Exception as e:

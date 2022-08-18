@@ -362,7 +362,7 @@ class PageParser(Parser):
                 weibo.id = info.xpath('@id')[0][2:]
                 weibo.content = self.get_weibo_content(info, n_info,
                                                        is_original)  # 微博内容
-                if not weibo.content:
+                if not weibo.content or weibo.content == 'filter_content':
                     weibo = None
                 else:
                     weibo.article_url = self.get_article_url(info)  # 头条文章url
