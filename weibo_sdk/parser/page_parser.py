@@ -11,6 +11,7 @@ from .mblog_picAll_parser import MblogPicAllParser
 from .parser import Parser
 from .util import handle_garbled, handle_html, to_video_download_url, handle_short_content
 from ..middleware.utils import toggle_cookie
+from weibo_sdk.middleware.utils import flush_cookies
 
 logger = logging.getLogger('spider.page_parser')
 
@@ -120,13 +121,28 @@ class PageParser(Parser):
             weibo_content = handle_short_content(n_info)
             a_text = info.xpath('div//a/text()')
             if u'全文' in a_text:
-                wb_content = CommentParser(self.cookie,
-                                           weibo_id).get_long_weibo()
-                if wb_content:
-                    weibo_content = wb_content
-                else:
-                    logger.warning('cookie失效')
-                    sys.exit()
+                for i in range(5):
+                    wb_content = CommentParser(self.cookie,
+                                               weibo_id).get_long_weibo()
+                    if wb_content:
+                        weibo_content = wb_content
+                        break
+                    else:
+                        logger.warning('cookie失效')
+                        if i == 2:
+                            logger.warning("error: 数据库cookie均已失效")
+                            logger.info("生成新的cookie中...")
+                            flush_cookies()
+                        if i == 4:
+                            logger.warning("cookie刷新后，仍然无法使用")
+                            sys.exit()
+                        n_cookie = toggle_cookie(self.cookie)
+                        if n_cookie:
+                            logger.info("正在切换cookie...")
+                            self.cookie = n_cookie
+                        else:
+                            logger.info("cookie无法切换")
+                            sys.exit()
             return weibo_content
         except Exception as e:
             logger.exception(e)
