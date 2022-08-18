@@ -90,12 +90,11 @@ class PageParser(Parser):
                             continue
                         publish_time = datetime_util.str_to_time(
                             weibo.publish_time)
-
                         if publish_time < since_date:
                             if self.is_pinned_weibo(info[i]):
                                 continue
                             else:
-                                return weibos, weibo_id_list, False
+                                return weibos, weibo_id_list, False, self.cookie, self.refresh_cookie
                         logger.info(weibo)
                         logger.info('-' * 100)
                         weibos.append(weibo)
