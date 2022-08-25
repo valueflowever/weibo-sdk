@@ -40,6 +40,17 @@ class MysqlDB:
         self._close(conn, cursor)
         return result
 
+    def execute_sql(self, sql: str):
+        conn = self._connect()
+        cursor = conn.cursor()
+        try:
+            cursor.execute(sql)
+            conn.commit()
+        except Exception as e:
+            conn.rollback()
+        finally:
+            self._close(conn, cursor)
+
 
 def filter_text(text_list: list) -> list:
     n_list = []
