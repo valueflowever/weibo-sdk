@@ -2,8 +2,6 @@ import pymysql
 import json
 import random
 
-black_word = []
-
 
 def get_config(config_path):
     """获取config.json数据"""
@@ -53,6 +51,7 @@ class MysqlDB:
 
 
 def filter_text(text_list: list) -> list:
+    black_word = get_black_word()
     n_list = []
     for text in text_list:
         for w in black_word:
@@ -82,3 +81,11 @@ def toggle_cookie(old_cookie) -> str:
         else:
             return random.choice(n_list)
 
+
+def get_black_word() -> list:
+    sql = 'select word from black_word where is_delete = 0'
+    words = MysqlDB().get(sql)
+    black_word_list = []
+    for item in words:
+        black_word_list.append(item[0])
+    return black_word_list
